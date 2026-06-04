@@ -1,59 +1,68 @@
-type College = {
-  id: string;
-  name: string;
-  location: string;
-  fees: number;
-  rating: number;
-  overview: string;
-  placements: string;
-};
-
-async function getColleges(): Promise<College[]> {
-  const res = await fetch("http://localhost:3000/api/colleges", {
-    cache: "no-store",
-  });
-
-  return res.json();
-}
+import CollegeSearch from "@/components/CollegeSearch";
+import { prisma } from "@/lib/prisma";
+import Link from "next/link";
 
 export default async function Home() {
-  const colleges = await getColleges();
+  const colleges = await prisma.college.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  const serializedColleges = colleges.map((college) => ({
+    ...college,
+    createdAt: college.createdAt.toISOString(),
+  }));
 
   return (
-    <main className="min-h-screen p-8">
-      <h1 className="text-4xl font-bold mb-8">
-        College Discovery Platform
-      </h1>
+    <main className="min-h-screen px-6 py-10 max-w-7xl mx-auto">
+      {/* Hero Section */}
+      <div className="text-center mb-12">
+        <h1 className="text-5xl md:text-6xl font-bold mb-4">
+          College Discovery Platform
+        </h1>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {colleges.map((college) => (
-          <div
-            key={college.id}
-            className="border rounded-xl p-5 shadow-sm"
-          >
-            <h2 className="text-xl font-semibold">
-              {college.name}
-            </h2>
+        <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+          Discover, compare and predict the best colleges for your future.
+          Search colleges, compare placements, and find suitable options
+          based on your rank.
+        </p>
+      </div>
 
-            <p>{college.location}</p>
+      {/* Search & Filters */}
+      <CollegeSearch colleges={serializedColleges} />
 
-            <p className="mt-2">
-              Rating: {college.rating}
-            </p>
+      {/* Navigation Buttons */}
+      <div className="mt-12 flex flex-wrap justify-center gap-4">
+        <Link
+          href="/compare"
+          className="
+            px-6 py-3
+            rounded-xl
+            bg-blue-600
+            hover:bg-blue-700
+            transition
+            font-medium
+            text-white
+          "
+        >
+          Compare Colleges
+        </Link>
 
-            <p>
-              Fees: ₹{college.fees.toLocaleString()}
-            </p>
-
-            <p className="mt-2 text-sm">
-              {college.overview}
-            </p>
-
-            <p className="mt-2 font-medium">
-              {college.placements}
-            </p>
-          </div>
-        ))}
+        <Link
+          href="/predictor"
+          className="
+            px-6 py-3
+            rounded-xl
+            bg-green-600
+            hover:bg-green-700
+            transition
+            font-medium
+            text-white
+          "
+        >
+          Predictor Tool
+        </Link>
       </div>
     </main>
   );
