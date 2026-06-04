@@ -1,6 +1,7 @@
 import CollegeSearch from "@/components/CollegeSearch";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import { Sparkles, BarChart2, Zap } from "lucide-react";
 
 export default async function Home() {
   const colleges = await prisma.college.findMany({
@@ -15,55 +16,51 @@ export default async function Home() {
   }));
 
   return (
-    <main className="min-h-screen px-6 py-10 max-w-7xl mx-auto">
+    <main className="min-h-screen pb-20">
       {/* Hero Section */}
-      <div className="text-center mb-12">
-        <h1 className="text-5xl md:text-6xl font-bold mb-4">
-          College Discovery Platform
-        </h1>
+      <section className="relative pt-20 pb-16 px-6 overflow-hidden">
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-bold tracking-widest uppercase mb-6 animate-fade-in">
+            <Sparkles size={14} />
+            The Future of College Search
+          </div>
+          
+          <h1 className="text-5xl md:text-7xl font-extrabold mb-8 tracking-tight leading-tight">
+            Find Your Dream <br />
+            <span className="text-gradient">College Today</span>
+          </h1>
 
-        <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-          Discover, compare and predict the best colleges for your future.
-          Search colleges, compare placements, and find suitable options
-          based on your rank.
-        </p>
-      </div>
+          <p className="text-xl text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+            Revolutionizing the way you discover, compare, and get predicted colleges. 
+            Data-driven insights for your academic journey.
+          </p>
 
-      {/* Search & Filters */}
-      <CollegeSearch colleges={serializedColleges} />
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <Link
+              href="/compare"
+              className="px-8 py-4 rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-500 transition-all flex items-center gap-2 shadow-lg shadow-blue-600/20"
+            >
+              <BarChart2 size={20} />
+              Compare Colleges
+            </Link>
 
-      {/* Navigation Buttons */}
-      <div className="mt-12 flex flex-wrap justify-center gap-4">
-        <Link
-          href="/compare"
-          className="
-            px-6 py-3
-            rounded-xl
-            bg-blue-600
-            hover:bg-blue-700
-            transition
-            font-medium
-            text-white
-          "
-        >
-          Compare Colleges
-        </Link>
+            <Link
+              href="/predictor"
+              className="px-8 py-4 rounded-2xl glass text-white font-bold hover:bg-white/5 transition-all flex items-center gap-2 border border-white/10"
+            >
+              <Zap size={20} />
+              Predictor Tool
+            </Link>
+          </div>
+        </div>
+      </section>
 
-        <Link
-          href="/predictor"
-          className="
-            px-6 py-3
-            rounded-xl
-            bg-green-600
-            hover:bg-green-700
-            transition
-            font-medium
-            text-white
-          "
-        >
-          Predictor Tool
-        </Link>
-      </div>
+      {/* Search & Listing Section */}
+      <section className="px-6">
+        <div className="max-w-7xl mx-auto">
+          <CollegeSearch colleges={serializedColleges} />
+        </div>
+      </section>
     </main>
   );
 }
