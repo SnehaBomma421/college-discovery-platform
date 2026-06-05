@@ -20,19 +20,23 @@ export default function PredictorPage() {
   const [results, setResults] = useState<College[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [error, setError] = useState("");
 
   async function handlePredict() {
   const rankNumber = Number(rank);
 
   if (
-    !Number.isInteger(rankNumber) ||
-    rankNumber <= 0
-  ) {
-    alert(
-      "Please enter a valid positive whole-number rank."
-    );
-    return;
-  }
+  rank.trim() === "" ||
+  !Number.isInteger(rankNumber) ||
+  rankNumber <= 0
+) {
+  setError(
+    "Please enter a valid positive whole-number rank."
+  );
+  return;
+}
+
+setError("");
 
   try {
     setLoading(true);
@@ -94,18 +98,33 @@ export default function PredictorPage() {
               </label>
               <div className="flex flex-col md:flex-row gap-4">
                 <div className="relative flex-1">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
-                  <input
-                    id="rank"
-                    type="number"
-                    min="1"
-                    step="1"
-                    placeholder="e.g. 1500"
-                    value={rank}
-                    onChange={(e) => setRank(e.target.value)}
-                    className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-xl font-bold"
-                  />
-                </div>
+  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
+  <input
+    id="rank"
+    type="number"
+    min="1"
+    step="1"
+    placeholder="e.g. 1500"
+    value={rank}
+    onChange={(e) => {
+      setRank(e.target.value);
+      setError("");
+    }}
+    className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-xl font-bold"
+  />
+
+  {error && (
+    <div className="mt-3 flex items-center gap-2">
+      <AlertCircle
+        size={16}
+        className="text-red-400"
+      />
+      <p className="text-red-400 text-sm font-medium">
+        {error}
+      </p>
+    </div>
+  )}
+</div>
                 <button
                   onClick={handlePredict}
                   disabled={loading}
