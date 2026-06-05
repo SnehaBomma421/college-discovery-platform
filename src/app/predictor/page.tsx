@@ -22,40 +22,47 @@ export default function PredictorPage() {
   const [hasSearched, setHasSearched] = useState(false);
 
   async function handlePredict() {
-    if (Number(rank) <= 0) {
-      alert("Please enter a valid rank");
+  const rankNumber = Number(rank);
+
+  if (
+    !Number.isInteger(rankNumber) ||
+    rankNumber <= 0
+  ) {
+    alert(
+      "Please enter a valid positive whole-number rank."
+    );
+    return;
+  }
+
+  try {
+    setLoading(true);
+    setHasSearched(true);
+
+    const res = await fetch("/api/predictor", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        rank: rankNumber,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (data.error) {
+      alert(data.error);
       return;
     }
 
-    try {
-      setLoading(true);
-      setHasSearched(true);
-
-      const res = await fetch("/api/predictor", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          rank: Number(rank),
-        }),
-      });
-
-      const data = await res.json();
-
-      if (data.error) {
-        alert(data.error);
-        return;
-      }
-
-      setResults(data);
-    } catch (error) {
-      console.error(error);
-      alert("Something went wrong");
-    } finally {
-      setLoading(false);
-    }
+    setResults(data);
+  } catch (error) {
+    console.error(error);
+    alert("Something went wrong");
+  } finally {
+    setLoading(false);
   }
+}
 
   return (
     <main className="min-h-screen pb-20 px-6">
@@ -92,6 +99,7 @@ export default function PredictorPage() {
                     id="rank"
                     type="number"
                     min="1"
+                    step="1"
                     placeholder="e.g. 1500"
                     value={rank}
                     onChange={(e) => setRank(e.target.value)}
@@ -159,4 +167,4 @@ export default function PredictorPage() {
       </div>
     </main>
   );
-}
+}

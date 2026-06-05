@@ -1,57 +1,57 @@
-export const dynamic = "force-dynamic";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET() {
-  return NextResponse.json({
-    message: "Predictor API working",
-  });
-}
-
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
     const { rank } = await req.json();
 
     if (!rank || rank <= 0) {
       return NextResponse.json(
-        { error: "Please enter a valid rank" },
+        { error: "Please enter a valid rank." },
         { status: 400 }
       );
     }
 
-    const colleges = await prisma.college.findMany();
+    let colleges;
 
-    let recommendations = [];
-
-    if (rank <= 5000) {
-      recommendations = colleges.filter(
-        (c) =>
-          c.name.includes("IIT") ||
-          c.name.includes("IIIT")
-      );
-    } else if (rank <= 15000) {
-      recommendations = colleges.filter(
-        (c) =>
-          c.name.includes("IIIT") ||
-          c.name.includes("BITS")
-      );
-    } else if (rank <= 30000) {
-      recommendations = colleges.filter(
-        (c) =>
-          c.name.includes("BITS") ||
-          c.name.includes("NIT")
-      );
+    if (rank <= 3000) {
+      colleges = await prisma.college.findMany({
+        where: { rating: { gte: 4.8 } },
+        orderBy: { rating: "desc" },
+        take: 8,
+      });
+    } else if (rank <= 10000) {
+      colleges = await prisma.college.findMany({
+        where: { rating: { gte: 4.7 } },
+        orderBy: { rating: "desc" },
+        take: 6,
+      });
+    } else if (rank <= 25000) {
+      colleges = await prisma.college.findMany({
+        where: { rating: { gte: 4.5 } },
+        orderBy: { rating: "desc" },
+        take: 5,
+      });
+    } else if (rank <= 50000) {
+      colleges = await prisma.college.findMany({
+        where: { rating: { gte: 4.4 } },
+        orderBy: { rating: "desc" },
+        take: 3,
+      });
     } else {
-      recommendations = colleges.filter(
-        (c) =>
-          c.name.includes("NIT")
-      );
+      colleges = await prisma.college.findMany({
+        where: { rating: { lte: 4.5 } },
+        orderBy: { rating: "desc" },
+        take: 2,
+      });
     }
 
-    return NextResponse.json(recommendations);
-  } catch {
+    return NextResponse.json(colleges);
+  } catch (error) {
+    console.error(error);
+
     return NextResponse.json(
-      { error: "Prediction failed" },
+      { error: "Something went wrong." },
       { status: 500 }
     );
   }
