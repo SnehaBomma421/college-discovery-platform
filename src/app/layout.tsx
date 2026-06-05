@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import { AuthProvider } from "@/lib/AuthContext";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,8 +21,12 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.className} bg-background text-foreground antialiased min-h-screen relative`}>
         <div className="fixed inset-0 -z-10 bg-gradient-premium pointer-events-none opacity-50" />
-        <Navbar />
-        {children}
+        <AuthProvider>
+          <ProtectedRoute>
+            <Navbar />
+            {children}
+          </ProtectedRoute>
+        </AuthProvider>
       </body>
     </html>
   );
